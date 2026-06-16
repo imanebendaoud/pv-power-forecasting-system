@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  pvforecast:
+    build: .
+    container_name: pvforecast_app
+    ports:
+      - "5000:5000"
+    restart: always          # redémarre toujours, même après crash ou reboot du serveur
+    volumes:
+      # Persistance de l'historique CSV — survit même si le conteneur est recréé
+      - ./data:/app/data
+    environment:
+      - TZ=Africa/Casablanca       # important : le scheduler utilise cette timezone
+      - HISTORY_DATA_DIR=/app/data  # historique.csv écrit dans le volume monté

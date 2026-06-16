@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PVForecast AI — Ouarzazate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-left">
+      <div class="logo">
+        <div class="logo-sun"><span class="sun-core">☀</span></div>
+        <div class="logo-text-wrap">
+          <span class="logo-main">PV<span class="logo-accent">FORECAST</span></span>
+          <span class="logo-sub">AI · Système de prévision photovoltaïque</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="location-badge">
+        <span class="loc-dot"></span>
+        <span>Ouarzazate · 30.92°N, 6.91°W · UTC+1</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="/historique" class="nav-btn"> Historique</a>
+      <div class="header-time">
+        <span class="time-label">HEURE LOCALE</span>
+        <span class="clock" id="clock">--:--:--</span>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="refreshAll()">
+        <span class="refresh-icon">↺</span> Actualiser
+      </button>
+    </div>
+  </header>
+
+  <div class="project-banner">
+    <span class="banner-icon"></span>
+    Système intelligent de prévision de la puissance photovoltaïque à court terme
+    <span class="banner-tag">VMD-LSTM · One-Step & Multi-Step</span>
+  </div>
+
+  <main class="dashboard">
+
+    <!-- ═══ SECTION 1 — PRÉVISION TEMPS RÉEL ═══ -->
+    <section class="section-realtime">
+      <div class="section-label">PRÉVISION · PROCHAIN PAS 30 MIN</div>
+      <div class="realtime-grid">
+
+        <div class="card card-hero" id="cardHero">
+          <div class="card-tag">Production estimée · VMD-LSTM One-Step</div>
+          <div class="pv-display">
+            <span class="pv-value" id="pvValue">--.-</span>
+            <span class="pv-unit">kW</span>
+          </div>
+          <div class="pv-meta">
+            <span class="pv-time">Pour <strong id="pvTime">--:--</strong></span>
+            <span class="day-badge" id="dayBadge">--</span>
+          </div>
+          <div class="pv-bar-wrap">
+            <div class="pv-bar" id="pvBar" style="width:0%"></div>
+          </div>
+          <div class="pv-bar-labels">
+            <span>0 kW</span><span>58 kW (max)</span>
+          </div>
+          <div class="kpi-grid">
+            <div class="mini-kpi">
+              <span class="mini-label">Utilisation</span>
+              <span class="mini-value" id="utilRate">--%</span>
+            </div>
+            <div class="mini-kpi">
+              <span class="mini-label">État</span>
+              <span class="mini-value" id="plantState">--</span>
+            </div>
+            <div class="mini-kpi" id="miniKpiNiveau">
+              <span class="mini-label">Niveau</span>
+              <span class="mini-value" id="prodLevel">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-col">
+          <div class="card card-sky" id="cardSky">
+            <div class="sky-icon-big" id="skyIcon">--</div>
+            <div class="sky-state-label" id="skyState">--</div>
+          </div>
+          <div class="card card-stat">
+            <div class="stat-icon">
+                <i class="ri-sun-line"></i>
+              </div>
+            <div class="stat-label">Élévation solaire</div>
+            <div class="stat-value" id="statElev">--</div>
+            <div class="stat-unit">degrés</div>
+          </div>
+          <div class="card card-stat">
+            <div class="stat-icon">
+              <i class="ri-flashlight-line"></i>
+            </div>
+            <div class="stat-label">Radiation globale</div>
+            <div class="stat-value" id="statRad">--</div>
+            <div class="stat-unit">W/m²</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ SECTION 2 — MÉTÉO ═══ -->
+    <section class="section-meteo">
+      <div class="section-label">CONDITIONS MÉTÉO ACTUELLES</div>
+      <div class="meteo-grid">
+        <div class="card card-meteo">
+          <div class="meteo-icon">
+            <i class="ri-temp-hot-line"></i>
+          </div>
+          <div class="meteo-label">Température ambiante</div>
+          <div class="meteo-value"><span id="meteoTemp">--</span><span class="meteo-u">°C</span></div>
+        </div>
+        <div class="card card-meteo">
+          <div class="meteo-icon">
+            <i class="ri-drop-line"></i>
+          </div>
+          <div class="meteo-label">Humidité relative</div>
+          <div class="meteo-value"><span id="meteoHum">--</span><span class="meteo-u">%</span></div>
+        </div>
+        <div class="card card-meteo">
+          <div class="meteo-icon">
+            <i class="ri-windy-line"></i>
+          </div>
+          <div class="meteo-label">Vitesse du vent</div>
+          <div class="meteo-value"><span id="meteoWind">--</span><span class="meteo-u">km/h</span></div>
+        </div>
+        <div class="card card-meteo">
+          <div class="meteo-icon">
+            <i class="ri-sun-cloudy-line"></i>
+          </div>
+          <div class="meteo-label">Indice de clarté</div>
+          <div class="meteo-value"><span id="meteoClear">--</span><span class="meteo-u"></span></div>
+        </div>
+        <div class="card card-meteo">
+          <div class="meteo-icon">
+            <i class="ri-dashboard-line"></i>
+          </div>
+          <div class="meteo-label">Temp. module PV</div>
+          <div class="meteo-value"><span id="meteoModTemp">--</span><span class="meteo-u">°C</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION 3 — INDICATEURS ═══ -->
+    <section>
+      <div class="section-label">INDICATEURS · 12 HEURES SUIVANTES</div>
+      <div class="indic-grid">
+        <div class="card card-indic">
+          <div class="indic-icon">🔋</div>
+          <div class="indic-label">Énergie totale prévue aujourd'hui</div>
+          <div class="indic-value">
+            <span id="indicEnergy">--</span>
+            <span class="indic-unit">kWh</span>
+          </div>
+          <div class="indic-sub" id="indicDate">--</div>
+        </div>
+        <div class="card card-indic card-indic-peak">
+          <div class="indic-icon">🌟</div>
+          <div class="indic-label">Pic de production prévu</div>
+          <div class="indic-value">
+            <span id="indicPeak">--</span>
+            <span class="indic-unit">kW</span>
+          </div>
+          <div class="indic-sub">à <strong id="indicPeakTime">--:--</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION 4 — GRAPHE PV 12H ═══ -->
+    <section class="section-chart">
+      <div class="section-label">PRÉVISION · 12 HEURES SUIVANTES · VMD-LSTM Multi-Step</div>
+      <div class="chart-wrap">
+        <div class="chart-loading" id="chartLoading">
+          <div class="spinner"></div><span>Calcul en cours…</span>
+        </div>
+        <canvas id="forecastChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION 5 — GRAPHE MÉTÉO ═══ -->
+    <section>
+      <div class="section-label">MÉTÉO · RADIATION & TEMPÉRATURE 12H</div>
+      <div class="chart-wrap">
+        <div class="chart-loading" id="chartLoadingMeteo">
+          <div class="spinner"></div><span>Chargement…</span>
+        </div>
+        <canvas id="meteoChart"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="status-bar">
+    <span id="lastUpdate">Dernière mise à jour : --</span>
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusMsg">En attente…</span>
+  </footer>
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

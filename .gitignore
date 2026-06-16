@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environnements virtuels
+venv/
+env/
+.env
+.venv
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Données sensibles / volumineuses
+data/
+*.csv
+*.h5
+*.pkl
+*.joblib
+
+# Modèles TensorFlow (souvent très lourds)
+# Commentez les lignes suivantes si vous voulez inclure vos modèles
+artifacts/
+artifacts_app/
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Fichiers temporaires
+tmp/
+temp/

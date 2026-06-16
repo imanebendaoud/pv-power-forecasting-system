@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historique — PVForecast AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- jQuery + DataTables (logique pagination/recherche/tri) -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+  <!-- SheetJS — export Excel côté navigateur -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <link rel="stylesheet" href="/static/css/historique.css"/>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-left">
+      <div class="logo">
+        <div class="logo-sun"><span class="sun-core">☀</span></div>
+        <div class="logo-text-wrap">
+          <span class="logo-main">PV<span class="logo-accent">FORECAST</span></span>
+          <span class="logo-sub">AI · Historique des prévisions</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="location-badge">
+        <span class="loc-dot"></span>
+        <span>Ouarzazate · 30.92°N, 6.91°W · UTC+1</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="/" class="nav-btn">← Dashboard</a>
+      <div class="header-time">
+        <span class="time-label">HEURE LOCALE</span>
+        <span class="clock" id="clock">--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="project-banner">
+    <span class="banner-icon">📋</span>
+    Historique des prévisions · Audit complet & Export
+    <span class="banner-tag">CSV · Auto-sauvegarde toutes les 30min</span>
+  </div>
+
+  <main class="dashboard">
+
+    <!-- ═══ FILTRES PÉRIODE ═══ -->
+    <section>
+      <div class="section-label">PÉRIODE D'ANALYSE</div>
+      <div class="filters-bar">
+        <div class="filter-btns">
+          <button class="filter-btn active" onclick="setDays(1,  this)">24h</button>
+          <button class="filter-btn"        onclick="setDays(3,  this)">3 jours</button>
+          <button class="filter-btn"        onclick="setDays(7,  this)">7 jours</button>
+          <button class="filter-btn"        onclick="setDays(30, this)">30 jours</button>
+          <button class="filter-btn"        onclick="setDays(365,this)">Tout</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ KPI RÉSUMÉ ═══ -->
+    <section>
+      <div class="section-label">RÉSUMÉ DE LA PÉRIODE</div>
+      <div class="summary-grid">
+        <div class="card card-summary">
+          <div class="summary-icon">📊</div>
+          <div class="summary-label">Prévisions enregistrées</div>
+          <div class="summary-value" id="summaryCount">--</div>
+        </div>
+        <div class="card card-summary">
+          <div class="summary-icon">⚡</div>
+          <div class="summary-label">Production max prévue</div>
+          <div class="summary-value"><span id="summaryMax">--</span><span class="summary-unit">kW</span></div>
+        </div>
+        <div class="card card-summary">
+          <div class="summary-icon">📈</div>
+          <div class="summary-label">Moyenne de production</div>
+          <div class="summary-value"><span id="summaryMean">--</span><span class="summary-unit">kW</span></div>
+        </div>
+        <div class="card card-summary card-summary-energy">
+          <div class="summary-icon">🔋</div>
+          <div class="summary-label">Énergie totale estimée</div>
+          <div class="summary-value"><span id="summaryEnergy">--</span><span class="summary-unit">kWh</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ GRAPHE HISTORIQUE ═══ -->
+    <section>
+      <div class="section-label">COURBE HISTORIQUE DES PRÉVISIONS PV</div>
+      <div class="chart-wrap">
+        <div class="chart-loading" id="chartLoadingHist">
+          <div class="spinner"></div><span>Chargement…</span>
+        </div>
+        <canvas id="histChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ═══ COMPARAISON JOUR / SEMAINE / MOIS ═══ -->
+    <section>
+      <div class="section-label">COMPARAISON · JOUR VS SEMAINE VS MOIS</div>
+      <div class="compare-grid">
+
+        <div class="card card-compare-table">
+          <div class="chart-loading" id="compareLoading">
+            <div class="spinner"></div><span>Chargement…</span>
+          </div>
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Période</th>
+                <th class="text-end">Énergie (kWh)</th>
+                <th class="text-end">PV Moy (kW)</th>
+                <th class="text-end">PV Max (kW)</th>
+              </tr>
+            </thead>
+            <tbody id="compareBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card card-compare-chart">
+          <canvas id="compareChart"></canvas>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ STATS PAR JOUR ═══ -->
+    <section>
+      <div class="section-label">STATISTIQUES JOURNALIÈRES</div>
+      <div class="table-wrap">
+        <div class="chart-loading" id="tableLoading">
+          <div class="spinner"></div><span>Chargement…</span>
+        </div>
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Enregistrements</th>
+              <th>PV Max (kW)</th>
+              <th>PV Moyen (kW)</th>
+              <th>Énergie (kWh)</th>
+            </tr>
+          </thead>
+          <tbody id="statsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ FILTRES AVANCÉS + TABLEAU DataTables ═══ -->
+    <section>
+      <div class="section-label">DÉTAIL DES ENREGISTREMENTS</div>
+
+      <div class="card filters-card">
+        <div class="filters-grid">
+
+          <div class="filter-group">
+            <label>PV (kW) min — max</label>
+            <div class="filter-inputs">
+              <input type="number" id="filterPvMin" placeholder="min" step="0.1">
+              <input type="number" id="filterPvMax" placeholder="max" step="0.1">
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Température (°C) min — max</label>
+            <div class="filter-inputs">
+              <input type="number" id="filterTempMin" placeholder="min" step="0.1">
+              <input type="number" id="filterTempMax" placeholder="max" step="0.1">
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Radiation (W/m²) min — max</label>
+            <div class="filter-inputs">
+              <input type="number" id="filterRadMin" placeholder="min" step="1">
+              <input type="number" id="filterRadMax" placeholder="max" step="1">
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button class="filter-apply-btn" onclick="applyFilters()">Filtrer</button>
+            <button class="filter-reset-btn" onclick="resetFilters()">✕</button>
+          </div>
+
+        </div>
+
+        <div class="export-row">
+          <button class="export-btn export-excel" onclick="exportExcel()">⬇ Exporter Excel (.xlsx)</button>
+          <button class="export-btn" onclick="exportCSV()">⬇ Exporter CSV (brut)</button>
+        </div>
+      </div>
+
+      <div class="table-wrap mt-3">
+        <div class="chart-loading" id="detailLoading">
+          <div class="spinner"></div><span>Chargement…</span>
+        </div>
+        <table class="hist-table" id="detailTable" style="width:100%">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>PV (kW)</th>
+              <th>Temp (°C)</th>
+              <th>Radiation (W/m²)</th>
+              <th>Humidité (%)</th>
+              <th>Vent (km/h)</th>
+              <th>Élévation (°)</th>
+              <th>État ciel</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="status-bar">
+    <span id="lastUpdate">--</span>
+    <span class="status-dot ok" id="statusDot"></span>
+    <span id="statusMsg">Prêt</span>
+  </footer>
+
+  <script src="/static/js/historique.js"></script>
+</body>
+</html>

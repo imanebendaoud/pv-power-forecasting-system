@@ -1,0 +1,189 @@
+/* ═══════════════════════════════════════════
+   CUSTOM — complément Bootstrap 5 (thème light)
+═══════════════════════════════════════════ */
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-monospace {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* ═══ SECTION LABEL ═══ */
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #6c757d;
+  border-left: 3px solid #ffc107;
+  padding-left: 0.6rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+/* ═══ LOGO ═══ */
+.logo-sun {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 14px rgba(255,193,7,0.45);
+  animation: glow 3s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,100% { box-shadow: 0 0 14px rgba(255,193,7,0.45); }
+  50%     { box-shadow: 0 0 24px rgba(255,193,7,0.6); }
+}
+
+/* ═══ PULSE DOT (location badge) ═══ */
+.pulsedot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: #198754;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(25,135,84,0.6);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ═══ PV VALUE ═══ */
+.pv-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: all 0.5s ease;
+}
+
+/* ═══ DAY BADGE ═══ */
+#dayBadge.jour { background-color: #fff3cd; color: #997404; border: 1px solid #ffe69c; }
+#dayBadge.nuit { background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe; }
+
+/* ═══ ÉTAT DU CIEL — couleurs dynamiques ═══ */
+.sky-card {
+  transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  border-width: 2px;
+}
+
+/* Nuit — fond sombre */
+.sky-card.sky-night {
+  background-color: #1a1f2e !important;
+  border-color: #2d3548 !important;
+}
+.sky-card.sky-night #skyState,
+.sky-card.sky-night .fw-bold { color: #f8f9fa !important; }
+
+/* Très ensoleillé */
+.sky-card.sky-high {
+  background-color: #fff8e1 !important;
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 16px rgba(255,193,7,0.2);
+}
+
+/* Partiellement ensoleillé */
+.sky-card.sky-medium {
+  background-color: #e7f6fd !important;
+  border-color: #0dcaf0 !important;
+  box-shadow: 0 0 16px rgba(13,202,240,0.15);
+}
+
+/* Nuageux */
+.sky-card.sky-low {
+  background-color: #f1f3f5 !important;
+  border-color: #adb5bd !important;
+}
+
+/* Très nuageux */
+.sky-card.sky-vlow {
+  background-color: #e9ecef !important;
+  border-color: #868e96 !important;
+}
+
+/* ═══ NIVEAU — couleurs dynamiques ═══ */
+#niveauBox { background-color: #f8f9fa; transition: background-color 0.3s, color 0.3s; }
+
+#niveauBox.niveau-faible { background-color: #f8d7da; }
+#niveauBox.niveau-faible #prodLevel { color: #dc3545; }
+
+#niveauBox.niveau-moyen { background-color: #fff3cd; }
+#niveauBox.niveau-moyen #prodLevel { color: #fd7e14; }
+
+#niveauBox.niveau-eleve { background-color: #d1e7dd; }
+#niveauBox.niveau-eleve #prodLevel { color: #198754; }
+
+#niveauBox.niveau-fort { background-color: #cff4fc; }
+#niveauBox.niveau-fort #prodLevel { color: #0dcaf0; }
+
+/* ═══ STATUS DOT ═══ */
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background-color: #adb5bd;
+  flex-shrink: 0;
+  transition: background-color 0.3s;
+}
+.status-dot.ok      { background-color: #198754; box-shadow: 0 0 6px rgba(25,135,84,0.5); }
+.status-dot.error   { background-color: #dc3545; box-shadow: 0 0 6px rgba(220,53,69,0.5); }
+.status-dot.loading { background-color: #ffc107; animation: pulse-dot 1s ease-in-out infinite; }
+
+/* ═══ CHART OVERLAY ═══ */
+.chart-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.92);
+  border-radius: 0.375rem;
+  z-index: 10;
+}
+.chart-overlay.hidden { display: none; }
+
+/* ═══ REFRESH SPINNING ═══ */
+.spinning { pointer-events: none; opacity: 0.85; }
+.spinning #refreshIcon { animation: spin 0.6s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══ HISTORIQUE — tableaux ═══ */
+.hist-th {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.table td { font-size: 0.8rem; white-space: nowrap; }
+
+/* Colonne PV colorée */
+.td-pv-high   { color: #fd7e14 !important; font-weight: 700; }
+.td-pv-medium { color: #0dcaf0 !important; font-weight: 600; }
+.td-pv-low    { color: #6c757d !important; }
+
+/* Badge état ciel dans tableau */
+.sky-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  background-color: #f1f3f5;
+  border: 1px solid #dee2e6;
+  color: #495057;
+}
+
+/* ═══ FILTER BTN ═══ */
+.filter-btn.active {
+  font-weight: 600;
+}
+
+/* ═══ CARD HOVER ═══ */
+.card { transition: box-shadow 0.2s; }
+.card:hover { box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08) !important; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 576px) {
+  .pv-value { font-size: 2.5rem; }
+}

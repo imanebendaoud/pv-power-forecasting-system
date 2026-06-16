@@ -1,0 +1,13 @@
+LSTM oneStep: R2--> 0.93
+LSTM MultiSteps: R2---->0.737
+LSTM VMD_OneStep: R2--->0.9297799537894006
+LSTM VMD_MultiSteps_avecEntropy: R2--->0.80
+Seq2seq:R2---->0.82
+SEQ2SEQ+VMD:0.76936280471375147
+LSTM VMD_multiteps_noEntropy: 0.80115
+seq2seq_vmd_sansNuit: r2--->0.7616278615541623
+lstm_GRU_sans_vmd:0.6529
+lstm_gru_ONeStep_vmd:R2:0.8302
+lstm_gru_multi_vmd:R2: 0.6838
+lstm_vmd_sansFS_one:R2: 0.8618755442945462
+lstm_vmd_sansFS_MULTI:R2:0.8110154625004761
